@@ -1,0 +1,60 @@
+from collections import defaultdict
+
+class SkillSwapApp:
+    def __init__(self):
+        self.users = {}
+        self.skills = defaultdict(set)
+        self.matches = defaultdict(list)
+    
+    def register_user(self, user_id, username):
+        self.users[user_id] = username
+    
+    def add_skill(self, user_id, skill):
+        self.skills[skill].add(user_id)
+    
+    def remove_skill(self, user_id, skill):
+        self.skills[skill].remove(user_id)
+    
+    def get_matches(self, user_id):
+        user_skills = self.skills.keys()
+        potential_matches = set()
+        
+        for skill in user_skills:
+            potential_matches.update(self.skills[skill])
+        
+        potential_matches.remove(user_id)
+        
+        for match in potential_matches:
+            if user_id in self.skills and match in self.skills[user_id]:
+                self.matches[user_id].append(match)
+    
+    def chat(self, user_id, match_id, message):
+        if match_id in self.matches[user_id]:
+            print(f"{self.users[user_id]} sent a message to {self.users[match_id]}: {message}")
+    
+    def swipe_skill(self, user_id, match_id, skill):
+        if match_id in self.matches[user_id]:
+            self.remove_skill(user_id, skill)
+            self.add_skill(match_id, skill)
+            print(f"{self.users[user_id]} and {self.users[match_id]} swapped skills: {skill}")
+    
+# Example usage
+app = SkillSwapApp()
+
+# Register users
+app.register_user(1, "User1")
+app.register_user(2, "User2")
+
+# Add skills to profiles
+app.add_skill(1, "Video Editing")
+app.add_skill(2, "Photo Editing")
+
+# Get matches for users
+app.get_matches(1)
+app.get_matches(2)
+
+# Chat between users
+app.chat(1, 2, "Hi User2, I'm interested in your photo editing skills!")
+
+# Swap skills
+app.swipe_skill(1, 2, "Video Editing")
